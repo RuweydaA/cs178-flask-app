@@ -59,6 +59,10 @@ def display_users():
     users_list = (('John','Doe','Comedy'),('Jane', 'Doe','Drama'))
     return render_template('display_users.html', users = users_list)
 
+@app.route('/testdb')
+def testdb():
+    rows = execute_query("SELECT * FROM Artist LIMIT 10;")
+    return str(rows)
 
 # these two lines of code should always be the last in the file
 if __name__ == '__main__':
