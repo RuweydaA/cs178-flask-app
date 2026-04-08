@@ -1,14 +1,15 @@
-# [Your Project Name Here]
+# Ruweyda Abdi
 
 **CS178: Cloud and Database Systems — Project #1**
-**Author:** [Your Name]
-**GitHub:** [your-username]
+**Author:** [Ruweyda Abdi]
+**GitHub:** [RuweydaA]
 
 ---
 
 ## Overview
 
-<!-- Describe your project in 2-4 sentences. What does it do? Who is it for? What problem does it solve? -->
+my project is a web application made with flask that connects both a MYSQL RDS and a DynamoDB databse.
+Users can be addded, viewed, updated, deleted and there is an additonal employee-customer disrectory is also there from the chinook database. 
 
 ---
 
@@ -25,26 +26,28 @@
 ## Project Structure
 
 ```
-ProjectOne/
+cs178-flask-app/
 ├── flaskapp.py          # Main Flask application — routes and app logic
 ├── dbCode.py            # Database helper functions (MySQL connection + queries)
-├── creds_sample.py      # Sample credentials file (see Credential Setup below)
 ├── templates/
-│   ├── home.html        # Landing page
-│   ├── [other].html     # Add descriptions for your other templates
-├── .gitignore           # Excludes creds.py and other sensitive files
+│   ├── home.html.       # Landing page
+│   ├── add_user.html
+│   ├── delete_user.html
+│   ├── update_user.html
+│   ├── display_users.html
+│   ├── employee_customer.html
+├── .gitignore.          # Excludes creds.py and other sensitive files
 └── README.md
 ```
 
----
 
 ## How to Run Locally
 
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/your-username/your-repo-name.git
-   cd your-repo-name
+   git clone https://github.com/RuweydaA/cs178-flask-app
+   cd cs178-flask-app
    ```
 
 2. Install dependencies:
@@ -70,7 +73,7 @@ ProjectOne/
 The app is deployed on an AWS EC2 instance. To view the live version:
 
 ```
-http://[your-ec2-public-ip]:8080
+http://52.91.21.245:8080/testdb
 ```
 
 _(Note: the EC2 instance may not be running after project submission.)_
@@ -97,39 +100,42 @@ db = "your-database-name"
 
 ### SQL (MySQL on RDS)
 
-<!-- Briefly describe your relational database schema. What tables do you have? What are the key relationships? -->
+- `Employee` — stores employee info; primary key is `EmployeeId`
+- `Customer` — stores customer info; foreign key `SupportRepId` links to Employee
 
-**Example:**
+JOIN query used:
+```sql
+SELECT Employee.FirstName, Employee.LastName, Employee.Title,
+Customer.FirstName AS CustFirst, Customer.LastName AS CustLast
+FROM Employee
+JOIN Customer ON Employee.EmployeeId = Customer.SupportRepId
+```
 
-- `[TableName]` — stores [description]; primary key is `[key]`
-- `[TableName]` — stores [description]; foreign key links to `[other table]`
 
-The JOIN query used in this project: <!-- describe it in plain English -->
+The JOIN query used in this project: The sql JOIN query is in the employee-customer route in flaskapp.py. it joins the employee and customer tables on supportrepid, which connects each customer to their assinged employee assistant.
 
 ### DynamoDB
 
-<!-- Describe your DynamoDB table. What is the partition key? What attributes does each item have? How does it connect to the rest of the app? -->
-
-- **Table name:** `[your-table-name]`
-- **Partition key:** `[key-name]`
-- **Used for:** [description]
+- **Table name:** `[Users]`
+- **Partition key:** `[UserID]`
+- **Used for:** [storing user records with Name and Major]
 
 ---
 
 ## CRUD Operations
 
-| Operation | Route      | Description    |
-| --------- | ---------- | -------------- |
-| Create    | `/[route]` | [what it does] |
-| Read      | `/[route]` | [what it does] |
-| Update    | `/[route]` | [what it does] |
-| Delete    | `/[route]` | [what it does] |
+| Operation | Route | Description |
+| --------- | ---------- | ----------------------------------------------------|
+| Create | `/add-user` | Adds a new user to DynamoDB using|
+| Read | `/display-users` | Retrieves all users from DynamoDB using|
+| Update | `/update-user` | Updates a user's Major using `update_item()` |
+| Delete | `/delete-user` | Removes a user from DynamoDB using `delete_item()`|
 
 ---
 
 ## Challenges and Insights
 
-<!-- What was the hardest part? What did you learn? Any interesting design decisions? -->
+The bigges challenge was making sure the feild names in the HTML matched the named in the flask route. I kept forgetting to change it. 
 
 ---
 

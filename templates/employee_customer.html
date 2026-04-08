@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Employee-Customer Directory</title>
+</head>
+<body>
+    <h1>Employee-Customer Directory</h1>
+    <table border="1" cellpadding="8">
+        <tr>
+            <th>Employee First</th>
+            <th>Employee Last</th>
+            <th>Title</th>
+            <th>Customer First</th>
+            <th>Customer Last</th>
+        </tr>
+        {% for row in rows %}
+        <tr>
+            <td>{{ row.FirstName }}</td>
+            <td>{{ row.LastName }}</td>
+            <td>{{ row.Title }}</td>
+            <td>{{ row.CustFirst }}</td>
+            <td>{{ row.CustLast }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>

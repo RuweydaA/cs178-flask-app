@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Artists</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <h1 class="mt-5">🎸 Artists</h1>
+        <a href="/" class="btn btn-secondary mb-3">← Back</a>
+        <table class="table table-striped">
+            <tr><th>Artist ID</th><th>Name</th></tr>
+            {% for artist in artists %}
+            <tr>
+                <td>{{ artist.ArtistId }}</td>
+                <td>{{ artist.Name }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+</body>
+</html>

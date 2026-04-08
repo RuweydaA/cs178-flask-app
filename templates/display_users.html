@@ -2,30 +2,29 @@
 <html lang="en">
 <head>
     <title>Users List</title>
-    <!-- Bootstrap CSS for styling the table -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 </head>
 <body>
     <div class="container">
         <h2 class="mt-5">Users List</h2>
         <table class="table table-bordered table-striped mt-3">
-            <thead class="thead-dark"> <!-- creates a dark background for the table header -->
+            <thead class="thead-dark">
                 <tr>
-                    <th>First Name</th>
-                    <th>Last Name</th>
-                    <th>Favorite Genre</th>
+                    <th>User ID</th>
+                    <th>Name</th>
+                    <th>Major</th>
                 </tr>
             </thead>
-            <tbody> <!-- table body -- loop through all of the users -->
+            <tbody>
                 {% for user in users %}
                 <tr>
-                    <td>{{ user[0] }}</td>
-                    <td>{{ user[1] }}</td>
-                    <td>{{ user[2] }}</td>
+                    <td>{{ user.UserID }}</td>
+                    <td>{{ user.Name }}</td>
+                    <td>{{ user.Major }}</td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
- </body>
+</body>
 </html>

@@ -1,6 +1,8 @@
-# author: T. Urness and M. Moore
-# description: Flask example using redirect, url_for, and flash
-# credit: the template html files were constructed with the help of ChatGPT
+## author: Ruweyda Abdi (starter code by T. Urness and M. Moore)
+# description: employee customer directory flask App using MySQL (RDS) and DynamoDB
+
+
+import boto3
 
 from flask import Flask
 from flask import render_template
@@ -11,53 +13,94 @@ app = Flask(__name__)
 app.secret_key = 'your_secret_key' # this is an artifact for using flash displays; 
                                    # it is required, but you can leave this alone
 
+# DynamoDB setup
+dynamodb = boto3.resource('dynamodb', region_name='us-east-1')
+table = dynamodb.Table('Users')                                    
+
 @app.route('/')
 def home():
     return render_template('home.html')
 
+
 @app.route('/add-user', methods=['GET', 'POST'])
 def add_user():
     if request.method == 'POST':
-        # Extract form data
-        first_name = request.form['First name']
-        last_name = request.form['Last name']
-        genre = request.form['genre']
-        
-        # Process the data (e.g., add it to a database)
-        # For now, let's just print it to the console
-        print("First and Last Name:", first_name, last_name, ":", "Favorite Genre:", genre)
-        
-        flash('User added successfully! Huzzah!', 'success')  # 'success' is a category; makes a green banner at the top
-        # Redirect to home page or another page upon successful submission
-        return redirect(url_for('home'))
-    else:
-        # Render the form page if the request method is GET
-        return render_template('add_user.html')
+        try:
+            user_id = request.form['user_id']
+            name = request.form['name']
+            major = request.form['major']
+            table.put_item(Item={
+                'UserID': user_id,
+                'Name': name,
+                'Major': major
+            })
+            flash('User added successfully! Huzzah!', 'success')
+            return redirect(url_for('display_users'))
+        except Exception as e:
+            flash(f'Error adding user: {e}', 'error')
+    return render_template('add_user.html')
 
-@app.route('/delete-user',methods=['GET', 'POST'])
+@app.route('/delete-user', methods=['GET', 'POST'])
 def delete_user():
     if request.method == 'POST':
-        # Extract form data
-        name = request.form['name']
-        
-        # Process the data (e.g., add it to a database)
-        # For now, let's just print it to the console
-        print("Name to delete:", name)
-        
-        flash('User deleted successfully! Hoorah!', 'warning') 
-        # Redirect to home page or another page upon successful submission
-        return redirect(url_for('home'))
-    else:
-        # Render the form page if the request method is GET
-        return render_template('delete_user.html')
+        try:
+            user_id = request.form['user_id']
+            table.delete_item(Key={'UserID': user_id})
+            flash('User deleted successfully! Hoorah!', 'warning')
+            return redirect(url_for('display_users'))
+        except Exception as e:
+            flash(f'Error deleting user: {e}', 'error')
+    return render_template('delete_user.html')
 
+@app.route('/update-user', methods=['GET', 'POST'])
+def update_user():
+    if request.method == 'POST':
+        try:
+            user_id = request.form['user_id']
+            new_major = request.form['major']
+            table.update_item(
+                Key={'UserID': user_id},
+                UpdateExpression='SET Major = :m',
+                ExpressionAttributeValues={':m': new_major}
+            )
+            flash('User updated successfully!', 'success')
+            return redirect(url_for('display_users'))
+        except Exception as e:
+            flash(f'Error updating user: {e}', 'error')
+    return render_template('update_user.html')
 
 @app.route('/display-users')
 def display_users():
-    # hard code a value to the users_list;
-    # note that this could have been a result from an SQL query :) 
-    users_list = (('John','Doe','Comedy'),('Jane', 'Doe','Drama'))
-    return render_template('display_users.html', users = users_list)
+    try:
+        response = table.scan()
+        users = response.get('Items')
+    except Exception as e:
+        flash(f'Error fetching users: {e}', 'error')
+        users = []
+    return render_template('display_users.html', users=users)
+
+#question 6
+#SELECT Employee.FirstName, Employee.LastName, Employee.Title,
+#Customer.FirstName AS CustFirst, Customer.LastName AS CustLast
+#FROM Employee
+#JOIN Customer ON Employee.EmployeeId = Customer.SupportRepId
+#LIMIT 50;
+
+@app.route('/employee-customer')
+def employee_customer():
+    try:
+        query = """
+            SELECT Employee.FirstName, Employee.LastName, Employee.Title,
+            Customer.FirstName AS CustFirst, Customer.LastName AS CustLast
+            FROM Employee
+            JOIN Customer ON Employee.EmployeeId = Customer.SupportRepId
+            LIMIT 50;
+        """
+        rows = execute_query(query)
+        return render_template('employee_customer.html', rows=rows)
+    except Exception as e:
+        flash(f'Database error: {e}', 'error')
+        return redirect(url_for('home'))
 
 @app.route('/testdb')
 def testdb():
